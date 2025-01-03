@@ -52,3 +52,38 @@ export const sampleNotifications = [
     },
   },
 ];
+
+export const sampleMessages = [
+  {
+    attachments: [
+      {
+        public_id: "image",
+        url: "https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg",
+      },
+    ],
+    content: "Hello",
+    _id: "erg45645rth",
+    sender: {
+      _id: "user._id",
+      name: "John Doe",
+    },
+    chat: "chatId",
+    createdAt: "2021-12-12T12:12:12.000Z",
+  },
+  {
+    attachments: [
+      {
+        public_id: "image2",
+        url: "https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg",
+      },
+    ],
+    content: "hi",
+    _id: "erg45645rtjhh",
+    sender: {
+      _id: "fgdgert",
+      name: "Jane Do2",
+    },
+    chat: "chatId",
+    createdAt: "2021-12-12T12:12:12.000Z",
+  },
+];
