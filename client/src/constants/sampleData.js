@@ -83,3 +83,75 @@ export const sampleMessages = [
     createdAt: "2021-12-12T12:12:12.000Z",
   },
 ];
+
+export const dashboardData = {
+  users: [
+    {
+      _id: "1",
+      name: "John Doe",
+      avatar: "https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg",
+      username: "johndoe",
+      groups: 5,
+      friends: 10,
+    },
+    {
+      _id: "2",
+      name: "Jane Doe",
+      avatar: "https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg",
+      username: "janedoe",
+      groups: 24,
+      friends: 15,
+    },
+  ],
+
+  chats: [
+    {
+      _id: "1",
+      name: "John Group",
+      avatar: ["https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg"],
+      groupChat: false,
+      members: [
+        {
+          _id: "1",
+          avatar:
+            "https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg",
+        },
+        {
+          _id: "2",
+          avatar:
+            "https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg",
+        },
+      ],
+      totalMembers: 6,
+      totalMessages: 14,
+      creator: {
+        name: "Jane Doe",
+        avatar: "https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg",
+      },
+    },
+    {
+      _id: "2",
+      name: "Jane Group",
+      avatar: ["https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg"],
+      groupChat: false,
+      members: [
+        {
+          _id: "1",
+          avatar:
+            "https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg",
+        },
+        {
+          _id: "2",
+          avatar:
+            "https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg",
+        },
+      ],
+      totalMembers: 2,
+      totalMessages: 10,
+      creator: {
+        name: "John Doe",
+        avatar: "https://rachelziv.com.au/wp-content/uploads/2020/01/happy.jpg",
+      },
+    },
+  ],
+};
