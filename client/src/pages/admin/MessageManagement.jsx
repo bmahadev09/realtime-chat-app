@@ -1,5 +1,11 @@
-import { Avatar, Stack } from "@mui/material";
+import { Avatar, Box, Stack } from "@mui/material";
 import AdminLayout from "../../components/layout/AdminLayout";
+import Table from "../../components/shared/Table";
+import { useEffect, useState } from "react";
+import { fileFormat, transformImage } from "../../lib/features";
+import { dashboardData } from "../../constants/sampleData";
+import moment from "moment";
+import RenderAttachment from "../../components/shared/RenderAttachment";
 
 const columns = [
   {
@@ -13,9 +19,32 @@ const columns = [
     headerName: "Attachment",
     headerClassName: "table-header",
     width: 200,
-    renderCell: (params) => (
-      <Avatar alt={params.row.name} src={params.row.avatar} />
-    ),
+    renderCell: (params) => {
+      const { attachments } = params.row;
+
+      return attachments?.length > 0
+        ? attachments.map((attachment, index) => {
+            const url = attachment.url;
+            const file = fileFormat(url);
+
+            return (
+              <Box key={index} style={{ cursor: "pointer" }}>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  download
+                  style={{
+                    color: "black",
+                  }}
+                >
+                  {RenderAttachment(file)}
+                </a>
+              </Box>
+            );
+          })
+        : "No Attachment";
+    },
   },
   {
     field: "content",
@@ -29,7 +58,12 @@ const columns = [
     headerClassName: "table-header",
     width: 200,
     renderCell: (params) => (
-      <Stack>
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={1}
+        style={{ cursor: "pointer" }}
+      >
         <Avatar alt={params.row.sender.name} src={params.row.sender.avatar} />
         <span>{params.row.sender.name}</span>
       </Stack>
@@ -56,9 +90,34 @@ const columns = [
 ];
 
 const MessageManagement = () => {
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    setRows(
+      dashboardData.messages.map((message) => ({
+        ...message,
+        id: message._id,
+        sender: {
+          name: message.sender.name,
+          avatar: transformImage(message.sender.avatar, 50),
+        },
+        chat: message.chat,
+        groupChat: message.groupChat ? "Yes" : "No",
+        createdAt: moment(message.createdAt).format("MMMM Do YYYY, h:mm:ss a"),
+      }))
+    );
+  }, []);
+
   return (
     <AdminLayout>
-      <div>Message Management</div>
+      <Table
+        heading={"All Messages"}
+        columns={columns}
+        rows={rows}
+        rowHeight={100}
+      >
+        Message{" "}
+      </Table>
     </AdminLayout>
   );
 };
