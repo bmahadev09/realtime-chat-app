@@ -1,8 +1,23 @@
 import express from "express";
-import { login } from "../controllers/userControllers.js";
+import {
+  getMyProfile,
+  login,
+  logoutUser,
+  newUser,
+} from "../controllers/userControllers.js";
+import { singleUpload } from "../middlewares/multer.js";
+import { isAuthenticated } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/login", login);
+// Login route
+router.post("/new", singleUpload, newUser);
+router.post("/login", login);
+
+//After here user must be authenticated to access the routes
+router.use(isAuthenticated);
+
+router.get("/profile", getMyProfile);
+router.get("/logout", logoutUser);
 
 export default router;
