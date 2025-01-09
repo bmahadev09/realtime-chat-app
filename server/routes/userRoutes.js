@@ -4,6 +4,7 @@ import {
   login,
   logoutUser,
   newUser,
+  searchUser,
 } from "../controllers/userControllers.js";
 import { singleUpload } from "../middlewares/multer.js";
 import { isAuthenticated } from "../middlewares/authMiddleware.js";
@@ -19,5 +20,6 @@ router.use(isAuthenticated);
 
 router.get("/profile", getMyProfile);
 router.get("/logout", logoutUser);
+router.get("/search", searchUser);
 
 export default router;
