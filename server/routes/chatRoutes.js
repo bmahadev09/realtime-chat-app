@@ -14,25 +14,49 @@ import {
   sendAttachments,
 } from "../controllers/chatControllers.js";
 import { attachmentsUpload } from "../middlewares/multer.js";
+import {
+  addMemberValidation,
+  chatIdValidation,
+  newGroupValidation,
+  removeMemberValidation,
+  renameGroupValidation,
+  sendAttachmentsValidation,
+  validateHandler,
+} from "../lib/validators.js";
 
 const router = express.Router();
 
 router.use(isAuthenticated);
 
-router.post("/new", newGroupChat);
+router.post("/new", newGroupValidation(), validateHandler, newGroupChat);
 router.get("/my-chats", getMyChats);
 router.get("/my-chats/groups", getMyGroups);
-router.put("/add-members", addMembers);
-router.put("/remove-member", removeMember);
-router.delete("/leave/:id", leaveGroup);
+router.put("/add-members", addMemberValidation(), validateHandler, addMembers);
+router.put(
+  "/remove-member",
+  removeMemberValidation(),
+  validateHandler,
+  removeMember
+);
+router.delete("/leave/:id", chatIdValidation(), validateHandler, leaveGroup);
 
 //send Attachment
-router.post("/message", attachmentsUpload, sendAttachments);
+router.post(
+  "/message",
+  attachmentsUpload,
+  sendAttachmentsValidation,
+  validateHandler,
+  sendAttachments
+);
 
 //get messages
-router.get("/messages/:id", getMessages);
+router.get("/messages/:id", chatIdValidation(), validateHandler, getMessages);
 
 //get chat details, rename, delete chat
-router.route("/:id").get(getChatDetails).put(renameGroup).delete(deleteChat);
+router
+  .route("/:id")
+  .get(chatIdValidation(), validateHandler, getChatDetails)
+  .put(renameGroupValidation(), validateHandler, renameGroup)
+  .delete(chatIdValidation(), validateHandler, deleteChat);
 
 export default router;

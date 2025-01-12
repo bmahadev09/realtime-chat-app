@@ -15,13 +15,6 @@ import { Message } from "../models/messageModel.js";
 const newGroupChat = TryCatch(async (req, res) => {
   const { name, members } = req.body;
 
-  if (members.length < 2) {
-    return res.status(400).json({
-      success: false,
-      message: "Group must have at least 3 members",
-    });
-  }
-
   const allMembers = [...members, req.user];
 
   await Chat.create({
@@ -95,10 +88,6 @@ const getMyGroups = TryCatch(async (req, res, next) => {
 
 const addMembers = TryCatch(async (req, res, next) => {
   const { chatId, members } = req.body;
-
-  if (!members || members.length === 0) {
-    return next(new Errorhandler("Select members to add", 400));
-  }
 
   const chat = await Chat.findById(chatId);
 

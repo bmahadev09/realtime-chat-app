@@ -8,12 +8,23 @@ import {
 } from "../controllers/userControllers.js";
 import { singleUpload } from "../middlewares/multer.js";
 import { isAuthenticated } from "../middlewares/authMiddleware.js";
+import {
+  loginValidation,
+  registerValidation,
+  validateHandler,
+} from "../lib/validators.js";
 
 const router = express.Router();
 
 // Login route
-router.post("/new", singleUpload, newUser);
-router.post("/login", login);
+router.post(
+  "/new",
+  singleUpload,
+  registerValidation(),
+  validateHandler,
+  newUser
+);
+router.post("/login", loginValidation(), validateHandler, login);
 
 //After here user must be authenticated to access the routes
 router.use(isAuthenticated);
