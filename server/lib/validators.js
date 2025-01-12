@@ -1,0 +1,3 @@
+const registerValidation = () => [];
+
+export { registerValidation };

@@ -421,21 +421,22 @@ const getMessages = TryCatch(async (req, res, next) => {
   const limit = 20;
   const skip = (page - 1) * limit;
 
-  const messages = await Message.find({ chat: chatId })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit)
-    .populate("sender", "name avatar")
-    .lean();
+  const [messages, totalMessageCount] = await Promise.all([
+    Message.find({ chat: chatId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("sender", "name")
+      .lean(),
 
-  const total = await Message.countDocuments({ chat: chatId });
+    Message.countDocuments({ chat: chatId }),
+  ]);
 
-  const totalPages = Math.ceil(total / limit);
+  const totalPages = Math.ceil(totalMessageCount / limit);
 
   return res.status(200).json({
     success: true,
-    messages,
-    total,
+    messages: messages.reverse(),
     totalPages,
   });
 });
