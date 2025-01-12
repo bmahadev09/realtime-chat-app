@@ -69,6 +69,19 @@ const renameGroupValidation = () => [
   body("name", "Please Enter New Name").notEmpty(),
 ];
 
+const sendRequestValidation = () => [
+  body("userId", "Please Enter User ID").notEmpty(),
+];
+
+const acceptRequestValidation = () => [
+  body("requestId", "Please Enter Request ID").notEmpty(),
+  body("accept")
+    .notEmpty()
+    .withMessage("Please Accept or Decline Request")
+    .isBoolean()
+    .withMessage("Accept must be a boolean"),
+];
+
 export {
   registerValidation,
   validateHandler,
@@ -79,4 +92,6 @@ export {
   sendAttachmentsValidation,
   chatIdValidation,
   renameGroupValidation,
+  sendRequestValidation,
+  acceptRequestValidation,
 };
