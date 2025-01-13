@@ -53,12 +53,6 @@ const removeMemberValidation = () => [
 
 const sendAttachmentsValidation = () => [
   body("chatId", "Please Enter Chat ID").notEmpty(),
-  check("files")
-    .notEmpty()
-    .withMessage("Please Upload Attachments")
-    .isArray({ min: 1, max: 5 })
-    .withMessage("attachments must be between 1 and 5"),
-  ,
 ];
 
 const chatIdValidation = () => [param("id", "Please Enter Chat ID").notEmpty()];
