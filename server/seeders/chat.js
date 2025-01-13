@@ -85,7 +85,7 @@ const createMessages = async (numMessages) => {
       const tempMessage = Message.create({
         chat: randomChat,
         sender: randomUser,
-        message: faker.lorem.sentence(10),
+        content: faker.lorem.sentence(10),
       });
 
       messagesPromise.push(tempMessage);
@@ -113,7 +113,7 @@ const createMessageInAChat = async (numMessages, chatId) => {
       const tempMessage = Message.create({
         chat: chatId,
         sender: randomUser,
-        message: faker.lorem.sentence(10),
+        content: faker.lorem.sentence(10),
       });
 
       messagesPromise.push(tempMessage);

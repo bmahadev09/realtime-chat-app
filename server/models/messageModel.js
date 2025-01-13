@@ -3,7 +3,6 @@ import mongoose, { Schema, Types, model } from "mongoose";
 const userSchema = new Schema(
   {
     content: String,
-
     attachments: [
       {
         public_id: {

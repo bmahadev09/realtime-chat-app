@@ -9,8 +9,14 @@ import { NEW_REQUEST, REFETCH_CHATS } from "../constants/events.js";
 import { getOtherMember } from "../lib/helper.js";
 
 //Create new user and send token in cookie
-const newUser = async (req, res) => {
+const newUser = TryCatch(async (req, res) => {
   const { name, username, password, bio } = req.body;
+
+  const file = req.files;
+
+  if (!file) {
+    return next(new Errorhandler("Please upload a avatar", 400));
+  }
 
   const avatar = {
     public_id: "asjhd",
@@ -26,7 +32,7 @@ const newUser = async (req, res) => {
   });
 
   sendToken(res, user, 201, "User created successfully");
-};
+});
 
 //Login user and send token in cookie
 const login = TryCatch(async (req, res, next) => {

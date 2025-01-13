@@ -21,7 +21,6 @@ const registerValidation = () => [
   body("username", "Please Enter Username").notEmpty(),
   body("password", "Please Enter Password").notEmpty(),
   body("bio", "Please Enter Bio").notEmpty(),
-  check("avatar", "Please Upload an Image").notEmpty(),
 ];
 
 const loginValidation = () => [
@@ -82,6 +81,10 @@ const acceptRequestValidation = () => [
     .withMessage("Accept must be a boolean"),
 ];
 
+const adminLoginValidation = () => [
+  body("secretKey", "Please Enter Secret Key").notEmpty(),
+];
+
 export {
   registerValidation,
   validateHandler,
@@ -94,4 +97,5 @@ export {
   renameGroupValidation,
   sendRequestValidation,
   acceptRequestValidation,
+  adminLoginValidation,
 };
