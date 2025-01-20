@@ -18,6 +18,12 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { lazy, Suspense, useState } from "react";
+import axios from "axios";
+import { server } from "../../constants/config";
+import { userNotExists } from "../../redux/reducers/auth";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { setIsMobileMenu } from "../../redux/reducers/misc";
 
 const Search = lazy(() => import("../specific/Search"));
 const NotificationDialog = lazy(() => import("../specific/Notification"));
@@ -26,14 +32,14 @@ const NewGroup = lazy(() => import("../specific/NewGroup"));
 const Header = () => {
   const navigate = useNavigate();
 
-  const [isMobile, setIsMobile] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
   const [isNewGroup, setIsNewGroup] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
 
+  const dispatch = useDispatch();
+
   const handleMobileMenu = () => {
-    console.log("Mobile Menu Clicked");
-    setIsMobile((prev) => !prev);
+    dispatch(setIsMobileMenu(true));
   };
 
   const openSearch = () => {
@@ -55,8 +61,16 @@ const Header = () => {
     setIsNotification((prev) => !prev);
   };
 
-  const logoutHandler = () => {
-    console.log("Logout Clicked");
+  const logoutHandler = async () => {
+    try {
+      const { data } = axios.get(`${server}/api/v1/user/logout`, {
+        withCredentials: true,
+      });
+      dispatch(userNotExists());
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    }
   };
 
   return (

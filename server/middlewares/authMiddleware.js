@@ -1,8 +1,9 @@
 import { adminSecretKey } from "../app.js";
 import { Errorhandler } from "../utils/utility.js";
 import jwt from "jsonwebtoken";
+import { TryCatch } from "./error.js";
 
-const isAuthenticated = (req, res, next) => {
+const isAuthenticated = TryCatch((req, res, next) => {
   const token = req.cookies["secretToken"];
 
   if (!token) {
@@ -13,9 +14,9 @@ const isAuthenticated = (req, res, next) => {
   req.user = decoded.id;
 
   next();
-};
+});
 
-const isAdmin = (req, res, next) => {
+const isAdmin = TryCatch((req, res, next) => {
   const token = req.cookies["admin-token"];
 
   if (!token) {
@@ -31,6 +32,6 @@ const isAdmin = (req, res, next) => {
   }
 
   next();
-};
+});
 
 export { isAuthenticated, isAdmin };
