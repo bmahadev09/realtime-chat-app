@@ -8,6 +8,7 @@ import Profile from "../specific/Profile";
 import { useMyChatsQuery } from "../../redux/api/api";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsMobileMenu } from "../../redux/reducers/misc";
+import { useErrors } from "../../hooks/hook";
 
 const AppLayout = () => (WrappedComponent) => {
   const ComponentWithLayout = (props) => {
@@ -16,10 +17,11 @@ const AppLayout = () => (WrappedComponent) => {
     const dispatch = useDispatch();
 
     const { isMobileMenu } = useSelector((state) => state.misc);
+    const { user } = useSelector((state) => state.auth);
 
-    const { data, isLoading, refetch } = useMyChatsQuery();
+    const { data, isLoading, isError, error, refetch } = useMyChatsQuery();
 
-    console.log("Chats", data);
+    useErrors([{ isError, error }]);
 
     const handleDeleteChat = (e, _id, groupChat) => {
       e.preventDefault();
@@ -81,7 +83,7 @@ const AppLayout = () => (WrappedComponent) => {
               }}
               height={"100%"}
             >
-              <Profile />
+              <Profile user={user} />
             </Grid>
           </Grid>
         </main>

@@ -1,4 +1,5 @@
 import { useInputValidation } from "6pp";
+import { Search as SearchIcon } from "@mui/icons-material";
 import {
   Dialog,
   DialogTitle,
@@ -7,22 +8,50 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import { Search as SearchIcon } from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  useLazySearchUserQuery,
+  useSendFriendRequestMutation,
+} from "../../redux/api/api";
+import { setIsSearch } from "../../redux/reducers/misc";
 import UserItem from "../shared/UserItem";
-import { useState } from "react";
-import { sampleUsers } from "../../constants/sampleData";
+import { useAsyncMutation } from "../../hooks/hook";
 
 const Search = () => {
   const search = useInputValidation("");
-  const [users, setUsers] = useState(sampleUsers);
+  const [users, setUsers] = useState([]);
 
-  const addFriendHandler = () => {
-    console.log("Add Friend Handler");
+  const dispatch = useDispatch();
+
+  const { isSearch } = useSelector((state) => state.misc);
+
+  const [searchUser] = useLazySearchUserQuery();
+  const [sendFriendRequest, isLoadingSendFriendRequest] = useAsyncMutation(
+    useSendFriendRequestMutation
+  );
+
+  const addFriendHandler = async (id) => {
+    await sendFriendRequest("Sending Friend Request", { userId: id });
   };
-  const isLoadingSendFriendRequest = false;
+
+  const searchCloseHandler = () => {
+    dispatch(setIsSearch(false));
+  };
+
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      searchUser(search.value).then(({ data }) => {
+        setUsers(data.users);
+        //console.log(data);
+      });
+    }, 1000);
+
+    return () => clearTimeout(timeOutId);
+  }, [search.value]);
 
   return (
-    <Dialog open>
+    <Dialog open={isSearch} onClose={searchCloseHandler}>
       <DialogTitle
         sx={{
           display: "flex",
@@ -50,9 +79,9 @@ const Search = () => {
         />
 
         <List>
-          {users.map((user, idx) => (
+          {users.map((user) => (
             <UserItem
-              key={idx}
+              key={user._id}
               user={user}
               handler={addFriendHandler}
               handlerIsLoading={isLoadingSendFriendRequest}
