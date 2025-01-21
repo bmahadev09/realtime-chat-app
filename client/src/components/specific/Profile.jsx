@@ -4,7 +4,7 @@ import moment from "moment";
 import { transformImage } from "../../lib/features";
 
 const Profile = ({ user }) => {
-  console.log(user);
+  //console.log(user);
 
   return (
     <Stack direction={"column"} spacing={"2rem"} alignItems={"center"}>

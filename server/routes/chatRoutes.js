@@ -41,13 +41,7 @@ router.put(
 router.delete("/leave/:id", chatIdValidation(), validateHandler, leaveGroup);
 
 //send Attachment
-router.post(
-  "/message",
-  attachmentsUpload,
-  sendAttachmentsValidation,
-  validateHandler,
-  sendAttachments
-);
+router.post("/message", attachmentsUpload, sendAttachments);
 
 //get messages
 router.get("/messages/:id", chatIdValidation(), validateHandler, getMessages);

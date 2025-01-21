@@ -9,12 +9,15 @@ import { createServer } from "http";
 import { v4 as uuid } from "uuid";
 import { v2 as cloudinary } from "cloudinary";
 
-import userRoute from "./routes/userRoutes.js";
-import chatRoute from "./routes/chatRoutes.js";
-import adminRoute from "./routes/adminRoutes.js";
 import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/messageModel.js";
+import { corsOptions } from "./constants/config.js";
+import { socketAuth } from "./middlewares/authMiddleware.js";
+
+import userRoute from "./routes/userRoutes.js";
+import chatRoute from "./routes/chatRoutes.js";
+import adminRoute from "./routes/adminRoutes.js";
 
 dotenv.config({
   path: "./.env",
@@ -39,21 +42,14 @@ cloudinary.config({
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {});
+const io = new Server(server, {
+  cors: corsOptions,
+});
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:4173",
-      process.env.CLIENT_URL,
-    ],
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-//app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 //console.log(process.env.PORT);
 
@@ -65,25 +61,21 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-// io.use((socket, next) => {
-//   const token = socket.handshake.auth.token;
-
-//   if (token) {
-//     return next();
-//   }
-
-//   return next(new Error("Authentication error"));
-// })
+io.use((socket, next) => {
+  cookieParser()(
+    socket.request,
+    socket.request.res,
+    async (err) => await socketAuth(err, socket, next)
+  );
+});
 
 io.on("connection", (socket) => {
-  const user = {
-    _id: "sudfhsdfd",
-    name: "Anonymous",
-  };
+  const user = socket.user;
+  //console.log(user);
 
   userSocketIDs.set(user._id.toString(), socket.id);
 
-  console.log("A user connected", socket.id);
+  //console.log("A user connected", socket.id);
 
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {
@@ -120,7 +112,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected");
+    //console.log("User disconnected");
 
     userSocketIDs.delete(user._id.toString());
   });

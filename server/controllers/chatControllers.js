@@ -7,7 +7,11 @@ import {
 import { getOtherMember } from "../lib/helper.js";
 import { TryCatch } from "../middlewares/error.js";
 import { Chat } from "../models/chatModel.js";
-import { deleteFilesFromCloudinary, emitEvent } from "../utils/features.js";
+import {
+  deleteFilesFromCloudinary,
+  emitEvent,
+  uploadFilesToCloudinary,
+} from "../utils/features.js";
 import { Errorhandler } from "../utils/utility.js";
 import { User } from "../models/userModel.js";
 import { Message } from "../models/messageModel.js";
@@ -238,7 +242,11 @@ const leaveGroup = TryCatch(async (req, res, next) => {
 const sendAttachments = TryCatch(async (req, res, next) => {
   const { chatId } = req.body;
 
+  //console.log(chatId);
+
   const files = req.files || [];
+
+  //console.log(files);
 
   if (files.length > 5) {
     return next(new Errorhandler("You can only upload 5 files at a time", 400));
@@ -258,7 +266,7 @@ const sendAttachments = TryCatch(async (req, res, next) => {
   }
 
   //upload files to cloudinary
-  const attachments = [];
+  const attachments = await uploadFilesToCloudinary(files);
 
   const messageForDB = {
     content: "",
