@@ -29,7 +29,7 @@ const sendToken = (res, user, statusCode, message) => {
   return res
     .status(statusCode)
     .cookie("secretToken", token, cookieOptions)
-    .json({ success: true, message });
+    .json({ success: true, user, message });
 };
 
 const emitEvent = (req, event, users, data) => {

@@ -9,8 +9,6 @@ import {
   LineElement,
   ArcElement,
   Legend,
-  plugins,
-  scales,
 } from "chart.js";
 import { getLast7Days } from "../../lib/features";
 
@@ -58,7 +56,7 @@ const LineChart = ({ value = [] }) => {
     labels,
     datasets: [
       {
-        label: "Revenue",
+        label: "Messages",
         data: value,
         fill: true,
         backgroundColor: "rgba(75, 192, 192, 0.2)",

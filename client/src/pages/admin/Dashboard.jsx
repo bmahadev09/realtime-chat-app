@@ -13,8 +13,18 @@ import {
   SearchField,
 } from "../../components/styles/StyledComponents";
 import { DoughnutChart, LineChart } from "../../components/specific/Charts";
+import { LayoutLoader } from "../../components/layout/Loaders";
+import { useErrors } from "../../hooks/hook";
+import { useGetAdminStatsQuery } from "../../redux/api/api";
 
 const Dashboard = () => {
+  const { isError, error, data, isLoading } = useGetAdminStatsQuery();
+
+  console.log(data);
+  const { stats } = data || {};
+
+  useErrors([{ isError: isError, error: error }]);
+
   const Appbar = (
     <Paper
       elevation={3}
@@ -63,13 +73,27 @@ const Dashboard = () => {
       alignItems={"center"}
       margin={"2rem 0"}
     >
-      <Widget title={"Total Users"} value={100} Icon={<Person />} />
-      <Widget title={"Total Chats"} value={40} Icon={<Group />} />
-      <Widget title={"Total Messages"} value={600} Icon={<Message />} />
+      <Widget
+        title={"Total Users"}
+        value={stats?.totalUsers}
+        Icon={<Person />}
+      />
+      <Widget
+        title={"Total Chats"}
+        value={stats?.totalChats}
+        Icon={<Group />}
+      />
+      <Widget
+        title={"Total Messages"}
+        value={stats?.totalMessages}
+        Icon={<Message />}
+      />
     </Stack>
   );
 
-  return (
+  return isLoading ? (
+    <LayoutLoader />
+  ) : (
     <AdminLayout>
       <Container component={"main"}>
         {Appbar}
@@ -100,7 +124,7 @@ const Dashboard = () => {
             <Typography margin={"2rem 0"} variant="h4">
               Last messages
             </Typography>
-            <LineChart value={[4, 9, 6, 12]} />
+            <LineChart value={stats?.messagesChart || []} />
           </Paper>
           <Paper
             elevation={3}
@@ -117,7 +141,10 @@ const Dashboard = () => {
           >
             <DoughnutChart
               labels={["Single Chats", "Group Chats"]}
-              value={[23, 66]}
+              value={[
+                stats?.totalChats - stats?.groupsCount || 0,
+                stats?.groupsCount || 0,
+              ]}
             />
 
             <Stack

@@ -11,7 +11,7 @@ const Table = ({ rows, columns, heading, rowHeight = 52 }) => {
       <Paper
         elevation={3}
         sx={{
-          padding: "1rem 4rem",
+          padding: "1rem 2rem",
           height: "100%",
           borderRadius: "1rem",
           margin: "auto",

@@ -18,6 +18,8 @@ import {
 } from "@mui/icons-material";
 import { useState } from "react";
 import { useLocation, Link, Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { adminLogout } from "../../redux/thunks/admin";
 
 const LinkComponent = styled(Link)`
   text-decoration: none;
@@ -54,9 +56,10 @@ const adminTabs = [
 
 const Sidebar = ({ w = "100%" }) => {
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const logoutHandler = () => {
-    console.log("Logout");
+    dispatch(adminLogout());
   };
 
   return (
@@ -97,10 +100,10 @@ const Sidebar = ({ w = "100%" }) => {
   );
 };
 
-const isAdmin = true;
-
 const AdminLayout = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const { isAdmin } = useSelector((state) => state.auth);
 
   const handleMobile = () => {
     setMobileOpen(!mobileOpen);

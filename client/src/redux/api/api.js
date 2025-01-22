@@ -159,6 +159,34 @@ const api = createApi({
       }),
       invalidatesTags: ["Chat"],
     }),
+
+    getAdminStats: builder.query({
+      query: () => ({
+        url: "admin/stats",
+        credentials: "include",
+      }),
+    }),
+
+    getAllUsers: builder.query({
+      query: () => ({
+        url: "admin/users",
+        credentials: "include",
+      }),
+    }),
+
+    getAllChats: builder.query({
+      query: () => ({
+        url: "admin/chats",
+        credentials: "include",
+      }),
+    }),
+
+    getAllMessages: builder.query({
+      query: () => ({
+        url: "admin/messages",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -181,4 +209,8 @@ export const {
   useAddGroupMembersMutation,
   useDeleteChatMutation,
   useLeaveGroupMutation,
+  useGetAdminStatsQuery,
+  useGetAllUsersQuery,
+  useGetAllChatsQuery,
+  useGetAllMessagesQuery,
 } = api;

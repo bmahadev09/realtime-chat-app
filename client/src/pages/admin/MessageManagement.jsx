@@ -1,11 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Avatar, Box, Stack } from "@mui/material";
 import AdminLayout from "../../components/layout/AdminLayout";
 import Table from "../../components/shared/Table";
 import { useEffect, useState } from "react";
 import { fileFormat, transformImage } from "../../lib/features";
-import { dashboardData } from "../../constants/sampleData";
 import moment from "moment";
 import RenderAttachment from "../../components/shared/RenderAttachment";
+import { useErrors } from "../../hooks/hook";
+import { useGetAllMessagesQuery } from "../../redux/api/api";
+import { LayoutLoader } from "../../components/layout/Loaders";
 
 const columns = [
   {
@@ -38,7 +41,7 @@ const columns = [
                     color: "black",
                   }}
                 >
-                  {RenderAttachment(file)}
+                  {RenderAttachment(file, url)}
                 </a>
               </Box>
             );
@@ -92,9 +95,13 @@ const columns = [
 const MessageManagement = () => {
   const [rows, setRows] = useState([]);
 
+  const { isError, error, data, isLoading } = useGetAllMessagesQuery();
+
+  useErrors([{ isError: isError, error: error }]);
+
   useEffect(() => {
     setRows(
-      dashboardData.messages.map((message) => ({
+      data?.messages.map((message) => ({
         ...message,
         id: message._id,
         sender: {
@@ -106,9 +113,11 @@ const MessageManagement = () => {
         createdAt: moment(message.createdAt).format("MMMM Do YYYY, h:mm:ss a"),
       }))
     );
-  }, []);
+  }, [data]);
 
-  return (
+  return isLoading ? (
+    <LayoutLoader />
+  ) : (
     <AdminLayout>
       <Table
         heading={"All Messages"}

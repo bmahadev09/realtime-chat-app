@@ -1,10 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import Table from "../../components/shared/Table";
 import { Avatar, Stack } from "@mui/material";
-import { dashboardData } from "../../constants/sampleData";
 import { transformImage } from "../../lib/features";
 import AvatarCard from "../../components/shared/AvatarCard";
+import { useErrors } from "../../hooks/hook";
+import { useGetAllChatsQuery } from "../../redux/api/api";
+import { LayoutLoader } from "../../components/layout/Loaders";
 
 const columns = [
   {
@@ -25,6 +28,12 @@ const columns = [
     headerName: "Name",
     headerClassName: "table-header",
     width: 300,
+  },
+  {
+    field: "groupChat",
+    headerName: "Group",
+    headerClassName: "table-header",
+    width: 100,
   },
   {
     field: "totalMembers",
@@ -64,9 +73,13 @@ const columns = [
 const ChatManagement = () => {
   const [rows, setRows] = useState([]);
 
+  const { isError, error, data, isLoading } = useGetAllChatsQuery();
+
+  useErrors([{ isError: isError, error: error }]);
+
   useEffect(() => {
     setRows(
-      dashboardData.chats.map((chat) => ({
+      data?.chats.map((chat) => ({
         ...chat,
         id: chat._id,
         avatar: chat.avatar.map((avatar) => transformImage(avatar, 50)),
@@ -79,9 +92,11 @@ const ChatManagement = () => {
         },
       }))
     );
-  }, []);
+  }, [data]);
 
-  return (
+  return isLoading ? (
+    <LayoutLoader />
+  ) : (
     <AdminLayout>
       <Table heading={"All Chats"} columns={columns} rows={rows}>
         User Management
