@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from "cloudinary";
 
 import { v4 as uuid } from "uuid";
-import { getBased64 } from "../lib/helper.js";
+import { getBased64, getSockets } from "../lib/helper.js";
 
 const cookieOptions = {
   httpOnly: true,
@@ -33,7 +33,9 @@ const sendToken = (res, user, statusCode, message) => {
 };
 
 const emitEvent = (req, event, users, data) => {
-  console.log("Emitting event", event);
+  const io = req.app.get("io");
+  const usersSocket = getSockets(users);
+  io.to(usersSocket).emit(event, data);
 };
 
 const uploadFilesToCloudinary = async (files = []) => {

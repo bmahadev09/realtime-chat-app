@@ -46,6 +46,8 @@ const io = new Server(server, {
   cors: corsOptions,
 });
 
+app.set("io", io);
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
@@ -109,6 +111,18 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.log(error);
     }
+  });
+
+  socket.on("START_TYPING", ({ chatId, members }) => {
+    const membersSockets = getSockets(members);
+
+    socket.to(membersSockets).emit("START_TYPING", { chatId });
+  });
+
+  socket.on("STOP_TYPING", ({ chatId, members }) => {
+    const membersSockets = getSockets(members);
+
+    socket.to(membersSockets).emit("STOP_TYPING", { chatId });
   });
 
   socket.on("disconnect", () => {

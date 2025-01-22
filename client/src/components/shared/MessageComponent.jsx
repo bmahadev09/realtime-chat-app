@@ -27,7 +27,7 @@ const MessageComponent = ({ message, user }) => {
     >
       {!sameSender && (
         <Typography color={lightBlue} fontWeight={"600"} variant="caption">
-          {sender.name}
+          {sender?.name}
         </Typography>
       )}
       {content && (

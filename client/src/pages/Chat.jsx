@@ -1,64 +1,52 @@
-import { IconButton, Skeleton, Stack } from "@mui/material";
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-refresh/only-export-components */
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import AppLayout from "../components/layout/AppLayout";
-import { useCallback, useRef, useState } from "react";
+import { IconButton, Skeleton, Stack } from "@mui/material";
 import { grayColor, orange } from "../constants/color";
-import { AttachFile, Send } from "@mui/icons-material";
+import {
+  AttachFile as AttachFileIcon,
+  Send as SendIcon,
+} from "@mui/icons-material";
 import { InputBox } from "../components/styles/StyledComponents";
 import FileMenu from "../components/dialogs/FileMenu";
 import MessageComponent from "../components/shared/MessageComponent";
-import { useSocket } from "../socket";
-import { NEW_MESSAGE } from "../constants/events";
+import {
+  ALERT,
+  NEW_MESSAGE,
+  START_TYPING,
+  STOP_TYPING,
+} from "../constants/events";
 import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
-import { useErrors, useSocketHandler } from "../hooks/hook";
+import { useErrors, useSocketEvents } from "../hooks/hook";
 import { useInfiniteScrollTop } from "6pp";
 import { useDispatch } from "react-redux";
 import { setIsFileMenu } from "../redux/reducers/misc";
+import { removeNewMessagesAlert } from "../redux/reducers/chat";
+import { TypingLoader } from "../components/layout/Loaders";
+import { useNavigate } from "react-router-dom";
+import { useSocket } from "../socket";
 
 const Chat = ({ chatId, user }) => {
-  const containerRef = useRef(null);
   const socket = useSocket();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const containerRef = useRef(null);
+  const bottomRef = useRef(null);
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
 
+  const [IamTyping, setIamTyping] = useState(false);
+  const [userTyping, setUserTyping] = useState(false);
+  const typingTimeout = useRef(null);
+
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
 
   const oldMessagesChunk = useGetMessagesQuery({ chatId, page });
-
-  //console.log("Chat Details", oldMessagesChunk?.data);
-
-  const errors = [
-    { isError: chatDetails.isError, error: chatDetails.error },
-    { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error },
-  ];
-
-  const members = chatDetails?.data?.chat?.members;
-
-  const handleFileOpen = (e) => {
-    dispatch(setIsFileMenu(true));
-    setFileMenuAnchor(e.currentTarget);
-  };
-
-  const messageSubmitHandler = (e) => {
-    e.preventDefault();
-
-    if (message.trim() === "") return;
-
-    // Emit message to server
-    socket.emit(NEW_MESSAGE, { chatId, members, message });
-    setMessage("");
-  };
-
-  const newMessagesHandler = useCallback((data) => {
-    setMessages((prev) => [...prev, data.message]);
-  }, []);
-
-  const eventArray = { [NEW_MESSAGE]: newMessagesHandler };
-
-  useSocketHandler(socket, eventArray);
 
   const { data: oldMessages, setData: setOldMessages } = useInfiniteScrollTop(
     containerRef,
@@ -68,7 +56,114 @@ const Chat = ({ chatId, user }) => {
     oldMessagesChunk.data?.messages
   );
 
-  //console.log("Old Messages", oldMessages);
+  const errors = [
+    { isError: chatDetails.isError, error: chatDetails.error },
+    { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error },
+  ];
+
+  const members = chatDetails?.data?.chat?.members;
+
+  const messageOnChange = (e) => {
+    setMessage(e.target.value);
+
+    if (!IamTyping) {
+      socket.emit(START_TYPING, { members, chatId });
+      setIamTyping(true);
+    }
+
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+
+    typingTimeout.current = setTimeout(() => {
+      socket.emit(STOP_TYPING, { members, chatId });
+      setIamTyping(false);
+    }, 2000);
+  };
+
+  const handleFileOpen = (e) => {
+    dispatch(setIsFileMenu(true));
+    setFileMenuAnchor(e.currentTarget);
+  };
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+
+    if (!message.trim()) return;
+    // Emitting the message to the server
+    socket.emit(NEW_MESSAGE, { chatId, members, message });
+    setMessage("");
+  };
+
+  useEffect(() => {
+    dispatch(removeNewMessagesAlert(chatId));
+
+    return () => {
+      setMessages([]);
+      setMessage("");
+      setOldMessages([]);
+      setPage(1);
+    };
+  }, [chatId]);
+
+  useEffect(() => {
+    if (bottomRef.current)
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    if (chatDetails.isError) return navigate("/");
+  }, [chatDetails.isError]);
+
+  const newMessagesListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+
+      setMessages((prev) => [...prev, data.message]);
+    },
+    [chatId]
+  );
+
+  const startTypingListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      setUserTyping(true);
+    },
+    [chatId]
+  );
+
+  const stopTypingListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      setUserTyping(false);
+    },
+    [chatId]
+  );
+
+  const alertListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      const messageForAlert = {
+        content: data.message,
+        sender: {
+          _id: "djasdhajksdhasdsadasdas",
+          name: "Admin",
+        },
+        chat: chatId,
+        createdAt: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev, messageForAlert]);
+    },
+    [chatId]
+  );
+
+  const eventHandler = {
+    [ALERT]: alertListener,
+    [NEW_MESSAGE]: newMessagesListener,
+    [START_TYPING]: startTypingListener,
+    [STOP_TYPING]: stopTypingListener,
+  };
+
+  useSocketEvents(socket, eventHandler);
 
   useErrors(errors);
 
@@ -77,31 +172,33 @@ const Chat = ({ chatId, user }) => {
   return chatDetails.isLoading ? (
     <Skeleton />
   ) : (
-    <>
+    <Fragment>
       <Stack
         ref={containerRef}
         boxSizing={"border-box"}
         padding={"1rem"}
         spacing={"1rem"}
-        height={"90%"}
         bgcolor={grayColor}
+        height={"90%"}
         sx={{
-          overflowY: "auto",
           overflowX: "hidden",
+          overflowY: "auto",
         }}
       >
-        {/* Chat Messages */}
-
-        {allMessages.map((message) => (
-          <MessageComponent key={message._id} message={message} user={user} />
+        {allMessages.map((i) => (
+          <MessageComponent key={i._id} message={i} user={user} />
         ))}
+
+        {userTyping && <TypingLoader />}
+
+        <div ref={bottomRef} />
       </Stack>
 
       <form
         style={{
           height: "10%",
         }}
-        onSubmit={messageSubmitHandler}
+        onSubmit={submitHandler}
       >
         <Stack
           direction={"row"}
@@ -114,39 +211,40 @@ const Chat = ({ chatId, user }) => {
             sx={{
               position: "absolute",
               left: "1.5rem",
-              rotate: "35deg",
+              rotate: "30deg",
             }}
             onClick={handleFileOpen}
           >
-            <AttachFile />
+            <AttachFileIcon />
           </IconButton>
+
           <InputBox
-            placeholder="Type Message Here...."
+            placeholder="Type Message Here..."
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={messageOnChange}
           />
+
           <IconButton
             type="submit"
             sx={{
-              rotate: "-35deg",
+              rotate: "-30deg",
               bgcolor: orange,
               color: "white",
-              marginLeft: "0.5rem",
+              marginLeft: "1rem",
               padding: "0.5rem",
               "&:hover": {
                 bgcolor: "error.dark",
               },
             }}
           >
-            <Send />
+            <SendIcon />
           </IconButton>
         </Stack>
       </form>
 
-      {/* <input type="file" /> */}
-      <FileMenu anchorEl={fileMenuAnchor} chatId={chatId} />
-    </>
+      <FileMenu anchorE1={fileMenuAnchor} chatId={chatId} />
+    </Fragment>
   );
 };
-const WrappedChat = AppLayout()(Chat);
-export default WrappedChat;
+
+export default AppLayout()(Chat);

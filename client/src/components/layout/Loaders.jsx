@@ -1,6 +1,6 @@
 import { Grid, Skeleton, Stack } from "@mui/material";
 
-export const LayoutLoader = () => {
+const LayoutLoader = () => {
   return (
     <Grid container height={"calc(100vh - 4rem)"} spacing={"1rem"}>
       <Grid
@@ -33,3 +33,21 @@ export const LayoutLoader = () => {
     </Grid>
   );
 };
+
+const TypingLoader = () => {
+  return (
+    <Stack direction={"row"} alignItems={"center"} spacing={"0.3rem"}>
+      {Array.from({ length: 5 }, (_, idx) => (
+        <Skeleton
+          key={idx}
+          variant="circular"
+          width={"0.5rem"}
+          height={"0.5rem"}
+        />
+      ))}
+      <Skeleton variant="text" width={"2rem"} height={"1rem"} />
+    </Stack>
+  );
+};
+
+export { TypingLoader, LayoutLoader };
