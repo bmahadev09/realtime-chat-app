@@ -9,7 +9,15 @@ import { createServer } from "http";
 import { v4 as uuid } from "uuid";
 import { v2 as cloudinary } from "cloudinary";
 
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
+import {
+  CHAT_JOINED,
+  CHAT_LEAVED,
+  NEW_MESSAGE,
+  NEW_MESSAGE_ALERT,
+  ONLINE_USERS,
+  START_TYPING,
+  STOP_TYPING,
+} from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/messageModel.js";
 import { corsOptions } from "./constants/config.js";
@@ -31,6 +39,7 @@ const adminSecretKey =
   process.env.ADMIN_SECRET_KEY || "ufehgdkhfvjkmmithudhgfodgj";
 
 const userSocketIDs = new Map();
+const onlineUsers = new Set();
 
 connectDB(mongoURI);
 
@@ -113,22 +122,37 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("START_TYPING", ({ chatId, members }) => {
+  socket.on(START_TYPING, ({ chatId, members }) => {
     const membersSockets = getSockets(members);
 
     socket.to(membersSockets).emit("START_TYPING", { chatId });
   });
 
-  socket.on("STOP_TYPING", ({ chatId, members }) => {
+  socket.on(STOP_TYPING, ({ chatId, members }) => {
     const membersSockets = getSockets(members);
 
     socket.to(membersSockets).emit("STOP_TYPING", { chatId });
   });
 
+  socket.on(CHAT_JOINED, ({ userId, members }) => {
+    onlineUsers.add(userId.toString());
+
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
+  });
+
+  socket.on(CHAT_LEAVED, ({ userId, members }) => {
+    onlineUsers.delete(userId.toString());
+
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
+  });
+
   socket.on("disconnect", () => {
     //console.log("User disconnected");
-
     userSocketIDs.delete(user._id.toString());
+    onlineUsers.delete(user._id.toString());
+    socket.broadcast.emit(ONLINE_USERS, Array.from(onlineUsers));
   });
 });
 
