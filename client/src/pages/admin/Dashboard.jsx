@@ -19,7 +19,7 @@ const Dashboard = () => {
     <Paper
       elevation={3}
       sx={{
-        padding: 2,
+        padding: 1,
         margin: "4rem 0",
         borderRadius: "1rem",
       }}
@@ -45,7 +45,7 @@ const Dashboard = () => {
           color="rgba(0, 0, 0, 0.7)"
           textAlign={"center"}
         >
-          {moment().format("dddd ,D MMMM YYYY")}
+          {moment().format("ddd, MMM Do YYYY")}
         </Typography>
         <Notifications />
       </Stack>
@@ -79,7 +79,6 @@ const Dashboard = () => {
             xs: "column",
             lg: "row",
           }}
-          flexWrap={"wrap"}
           justifyContent={"center"}
           alignItems={{
             xs: "center",

@@ -17,8 +17,8 @@ const AvatarCard = ({ avatar = [], max = 4 }) => {
               key={Math.random() * 100}
               alt={`avatar ${idx}`}
               sx={{
-                width: "3rem",
-                height: "3rem",
+                width: "2.5rem",
+                height: "2.5rem",
                 position: "absolute",
                 left: {
                   xs: `${idx + 0.5}rem`,

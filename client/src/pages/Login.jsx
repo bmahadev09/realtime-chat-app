@@ -21,6 +21,7 @@ import toast from "react-hot-toast";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -33,6 +34,9 @@ const Login = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+
+    const toastId = toast.loading("Signing up...");
+    setIsLoading(true);
 
     const formData = new FormData();
     formData.append("avatar", avatar.file);
@@ -54,15 +58,25 @@ const Login = () => {
         formData,
         config
       );
-      dispatch(userExists(true));
-      toast.success(data.message);
+      dispatch(userExists(data?.user));
+      toast.success(data.message, {
+        id: toastId,
+      });
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Something went wrong");
+      toast.error(error?.response?.data?.message || "Something went wrong", {
+        id: toastId,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    const toastId = toast.loading("Logging in...");
+
+    setIsLoading(true);
 
     const config = {
       withCredentials: true,
@@ -80,10 +94,16 @@ const Login = () => {
         },
         config
       );
-      dispatch(userExists(true));
-      toast.success(data.message);
+      dispatch(userExists(data?.user));
+      toast.success(data.message, {
+        id: toastId,
+      });
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Something went wrong");
+      toast.error(error?.response?.data?.message || "Something went wrong", {
+        id: toastId,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -145,6 +165,7 @@ const Login = () => {
                   variant={"contained"}
                   color={"primary"}
                   type="submit"
+                  disabled={isLoading}
                 >
                   Login
                 </Button>
@@ -156,6 +177,7 @@ const Login = () => {
                   variant={"text"}
                   color={"primary"}
                   onClick={() => setIsLogin(false)}
+                  disabled={isLoading}
                 >
                   Register
                 </Button>

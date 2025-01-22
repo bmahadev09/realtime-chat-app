@@ -9,15 +9,13 @@ import {
   Typography,
 } from "@mui/material";
 import { memo } from "react";
-import { sampleNotifications } from "../../constants/sampleData";
 import {
   useAcceptFriendRequestMutation,
   useGetNotificationsQuery,
 } from "../../redux/api/api";
-import { useErrors } from "../../hooks/hook";
+import { useAsyncMutation, useErrors } from "../../hooks/hook";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsNotification } from "../../redux/reducers/misc";
-import toast from "react-hot-toast";
 
 const Notification = () => {
   const { isNotification } = useSelector((state) => state.misc);
@@ -25,23 +23,12 @@ const Notification = () => {
 
   const { isLoading, data, error, isError } = useGetNotificationsQuery();
 
-  const [acceptRequest] = useAcceptFriendRequestMutation();
+  const [acceptRequest] = useAsyncMutation(useAcceptFriendRequestMutation);
 
   const friendRequestHandler = async ({ _id, accept }) => {
     dispatch(setIsNotification(false));
 
-    try {
-      const res = await acceptRequest({ requestId: _id, accept });
-
-      if (res?.data?.success) {
-        console.log("socket emit");
-        toast.success(res.data.message);
-      } else {
-        toast.error(res?.data?.error || "Something went wrong");
-      }
-    } catch (error) {
-      toast.error(error?.data?.message || "Something went wrong");
-    }
+    await acceptRequest("Accepting", { requestId: _id, accept });
   };
 
   const closeNotification = () => {
@@ -87,6 +74,8 @@ const Notification = () => {
 
 const NotificationItem = memo(({ sender, _id, handler }) => {
   const { name, avatar } = sender;
+  console.log(sender);
+
   return (
     <ListItem>
       <Stack
@@ -95,7 +84,7 @@ const NotificationItem = memo(({ sender, _id, handler }) => {
         spacing={"1rem"}
         width={"100%"}
       >
-        <Avatar />
+        <Avatar avatar={avatar} />
         <Typography
           variant="body1"
           sx={{

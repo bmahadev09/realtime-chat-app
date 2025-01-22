@@ -2,6 +2,7 @@ import { Box, Stack, Typography } from "@mui/material";
 import { Link } from "../styles/StyledComponents";
 import { memo } from "react";
 import AvatarCard from "./AvatarCard";
+import { motion } from "framer-motion";
 
 const ChatItem = ({
   avatar = [],
@@ -22,7 +23,10 @@ const ChatItem = ({
         padding: "0",
       }}
     >
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: "-100%" }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.1 }}
         style={{
           display: "flex",
           alignItems: "center",
@@ -37,7 +41,7 @@ const ChatItem = ({
         <Stack
           direction={"row"}
           alignItems={"center"}
-          spacing={{ xs: "1.5rem", sm: "2rem", md: "3rem", lg: "4rem" }}
+          spacing={{ xs: "1.5rem", sm: "2rem", md: "2rem", lg: "4rem" }}
         >
           <AvatarCard avatar={avatar} />
 
@@ -63,7 +67,7 @@ const ChatItem = ({
             }}
           />
         )}
-      </div>
+      </motion.div>
     </Link>
   );
 };

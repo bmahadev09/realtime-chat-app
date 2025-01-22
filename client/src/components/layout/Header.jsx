@@ -69,9 +69,10 @@ const Header = () => {
 
   const logoutHandler = async () => {
     try {
-      const { data } = axios.get(`${server}/api/v1/user/logout`, {
+      const { data } = await axios.get(`${server}/api/v1/user/logout`, {
         withCredentials: true,
       });
+
       dispatch(userNotExists());
       toast.success(data.message);
     } catch (error) {

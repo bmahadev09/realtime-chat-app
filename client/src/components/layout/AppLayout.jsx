@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Drawer, Grid, Skeleton } from "@mui/material";
 import Title from "../shared/Title";
 import Header from "./Header";
@@ -6,7 +7,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import Profile from "../specific/Profile";
 import { useMyChatsQuery } from "../../redux/api/api";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsMobileMenu } from "../../redux/reducers/misc";
+import {
+  setIsDeleteMenu,
+  setIsMobileMenu,
+  setSelectedDeleteChat,
+} from "../../redux/reducers/misc";
 import { useErrors, useSocketEvents } from "../../hooks/hook";
 import { useSocket } from "../../socket";
 import {
@@ -14,18 +19,22 @@ import {
   NEW_REQUEST,
   REFETCH_CHATS,
 } from "../../constants/events";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
   incrementNotification,
   setNewMessagesAlert,
 } from "../../redux/reducers/chat";
 import { getOrSaveFromStorage } from "../../lib/features";
+import DeleteChatMenu from "../dialogs/DeleteChatMenu";
 
 const AppLayout = () => (WrappedComponent) => {
   const ComponentWithLayout = (props) => {
     const params = useParams();
     const navigate = useNavigate();
+
     const chatId = params.chatId;
+    const deleteMenuAnchor = useRef(null);
+
     const dispatch = useDispatch();
 
     const socket = useSocket();
@@ -49,9 +58,11 @@ const AppLayout = () => (WrappedComponent) => {
       });
     }, [newMessagesAlert]);
 
-    const handleDeleteChat = (e, _id, groupChat) => {
-      e.preventDefault();
-      console.log("Delete Chat", _id);
+    const handleDeleteChat = (e, chatId, groupChat) => {
+      //e.preventDefault();
+      dispatch(setIsDeleteMenu(true));
+      deleteMenuAnchor.current = e.currentTarget;
+      dispatch(setSelectedDeleteChat({ chatId, groupChat }));
     };
 
     const handleMobileMenuClose = () => {
@@ -87,6 +98,11 @@ const AppLayout = () => (WrappedComponent) => {
       <>
         <Title />
         <Header />
+
+        <DeleteChatMenu
+          dispatch={dispatch}
+          deleteMenuAnchor={deleteMenuAnchor}
+        />
 
         {isLoading ? (
           <Skeleton />
