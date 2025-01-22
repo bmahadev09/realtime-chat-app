@@ -27,19 +27,26 @@ const ChatItem = ({
           display: "flex",
           alignItems: "center",
           gap: "1rem",
-          padding: "1rem",
+          padding: ".8rem",
           backgroundColor: sameSender ? "black" : "unset",
           color: sameSender ? "white" : "unset",
           position: "relative",
         }}
       >
         {/* avatar card */}
-        <AvatarCard avatar={avatar} />
-        <Stack>
-          <Typography ml={"1.5rem"}>{name}</Typography>
-          {newMessageAlert && (
-            <Typography>{newMessageAlert?.count} new messages</Typography>
-          )}
+        <Stack
+          direction={"row"}
+          alignItems={"center"}
+          spacing={{ xs: "1.5rem", sm: "2rem", md: "3rem", lg: "4rem" }}
+        >
+          <AvatarCard avatar={avatar} />
+
+          <Stack>
+            <Typography>{name}</Typography>
+            {newMessageAlert && (
+              <Typography>{newMessageAlert?.count} new messages</Typography>
+            )}
+          </Stack>
         </Stack>
 
         {isOnline && (

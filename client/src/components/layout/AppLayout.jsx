@@ -2,14 +2,18 @@ import { Drawer, Grid, Skeleton } from "@mui/material";
 import Title from "../shared/Title";
 import Header from "./Header";
 import ChatList from "../specific/ChatList";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Profile from "../specific/Profile";
 import { useMyChatsQuery } from "../../redux/api/api";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsMobileMenu } from "../../redux/reducers/misc";
 import { useErrors, useSocketEvents } from "../../hooks/hook";
 import { useSocket } from "../../socket";
-import { NEW_MESSAGE_ALERT, NEW_REQUEST } from "../../constants/events";
+import {
+  NEW_MESSAGE_ALERT,
+  NEW_REQUEST,
+  REFETCH_CHATS,
+} from "../../constants/events";
 import { useCallback, useEffect } from "react";
 import {
   incrementNotification,
@@ -20,6 +24,7 @@ import { getOrSaveFromStorage } from "../../lib/features";
 const AppLayout = () => (WrappedComponent) => {
   const ComponentWithLayout = (props) => {
     const params = useParams();
+    const navigate = useNavigate();
     const chatId = params.chatId;
     const dispatch = useDispatch();
 
@@ -65,9 +70,15 @@ const AppLayout = () => (WrappedComponent) => {
       dispatch(incrementNotification());
     }, [dispatch]);
 
+    const refetchListener = useCallback(() => {
+      refetch();
+      navigate("/");
+    }, [refetch, navigate]);
+
     const eventHandlers = {
       [NEW_MESSAGE_ALERT]: newMessagesAlertHandler,
       [NEW_REQUEST]: newRequestHandler,
+      [REFETCH_CHATS]: refetchListener,
     };
 
     useSocketEvents(socket, eventHandlers);

@@ -1,4 +1,5 @@
 import { Grid, Skeleton, Stack } from "@mui/material";
+import { BouncingSkeleton } from "../styles/StyledComponents";
 
 const LayoutLoader = () => {
   return (
@@ -37,12 +38,15 @@ const LayoutLoader = () => {
 const TypingLoader = () => {
   return (
     <Stack direction={"row"} alignItems={"center"} spacing={"0.3rem"}>
-      {Array.from({ length: 5 }, (_, idx) => (
-        <Skeleton
+      {Array.from({ length: 4 }, (_, idx) => (
+        <BouncingSkeleton
           key={idx}
           variant="circular"
           width={"0.5rem"}
           height={"0.5rem"}
+          style={{
+            animationDelay: `${idx * 0.2}s`,
+          }}
         />
       ))}
       <Skeleton variant="text" width={"2rem"} height={"1rem"} />

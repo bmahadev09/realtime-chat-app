@@ -33,7 +33,7 @@ const newGroupValidation = () => [
   body("members")
     .notEmpty()
     .withMessage("Please Enter Members")
-    .isArray({ min: 3, max: 100 })
+    .isArray({ min: 2, max: 100 })
     .withMessage("Members must be between 3 and 100"),
 ];
 

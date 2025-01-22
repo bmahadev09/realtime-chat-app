@@ -18,7 +18,7 @@ import {
   Search as SearchIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import axios from "axios";
 import { server } from "../../constants/config";
 import { userNotExists } from "../../redux/reducers/auth";
@@ -28,6 +28,7 @@ import {
   setIsMobileMenu,
   setIsNotification,
   setIsSearch,
+  setIsNewGroup,
 } from "../../redux/reducers/misc";
 import { resetNotificationCount } from "../../redux/reducers/chat";
 
@@ -38,11 +39,11 @@ const NewGroup = lazy(() => import("../specific/NewGroup"));
 const Header = () => {
   const navigate = useNavigate();
 
-  const [isNewGroup, setIsNewGroup] = useState(false);
-
   const dispatch = useDispatch();
 
-  const { isSearch, isNotification } = useSelector((state) => state.misc);
+  const { isSearch, isNewGroup, isNotification } = useSelector(
+    (state) => state.misc
+  );
   const { notificationCount } = useSelector((state) => state.chat);
 
   const handleMobileMenu = () => {
@@ -54,8 +55,7 @@ const Header = () => {
   };
 
   const openNewGroup = () => {
-    console.log("New Group Dialog Opened");
-    setIsNewGroup((prev) => !prev);
+    dispatch(setIsNewGroup(true));
   };
 
   const navigateToGroups = () => {

@@ -19,7 +19,7 @@ const miscSlice = createSlice({
   name: "misc",
   initialState,
   reducers: {
-    seIsNewGroup: (state, action) => {
+    setIsNewGroup: (state, action) => {
       state.isNewGroup = action.payload;
     },
     setIsNotification: (state, action) => {
@@ -51,7 +51,7 @@ const miscSlice = createSlice({
 
 export default miscSlice;
 export const {
-  seIsNewGroup,
+  setIsNewGroup,
   setIsNotification,
   setIsAddMember,
   setIsSearch,
