@@ -28,7 +28,7 @@ const App = () => {
     axios
       .get(`${server}/api/v1/user/profile`, { withCredentials: true })
       .then(({ data }) => {
-        dispatch(userExists(data.user));
+        dispatch(userExists(data?.user));
       })
       .catch((err) => {
         dispatch(userNotExists());

@@ -50,7 +50,7 @@ const AppLayout = () => (WrappedComponent) => {
 
     //console.log("New Messages Alert", newMessagesAlert);
 
-    const { data, isLoading, isError, error, refetch } = useMyChatsQuery(" ");
+    const { data, isLoading, isError, error, refetch } = useMyChatsQuery("");
 
     useErrors([{ isError, error }]);
 

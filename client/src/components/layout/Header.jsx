@@ -8,7 +8,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { orange } from "../../constants/color";
 import {
   Add,
   Group,
@@ -86,7 +85,7 @@ const Header = () => {
         <AppBar
           position="static"
           sx={{
-            bgcolor: orange,
+            bgcolor: "gray.600",
           }}
         >
           <Toolbar>
@@ -94,7 +93,7 @@ const Header = () => {
               variant="h6"
               sx={{ fontWeight: "bold", display: { xs: "none", sm: "block" } }}
             >
-              Chatting App
+              TalkyTime App
             </Typography>
 
             <Box

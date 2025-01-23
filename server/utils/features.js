@@ -7,6 +7,7 @@ import { getBased64, getSockets } from "../lib/helper.js";
 
 const cookieOptions = {
   httpOnly: true,
+  expires: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
   maxAge: 10 * 24 * 60 * 60 * 1000,
   sameSite: "none",
   secure: true,
